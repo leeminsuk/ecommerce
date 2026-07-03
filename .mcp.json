@@ -3,6 +3,10 @@
     "products": {
       "command": "node",
       "args": ["mcp/product-server.mjs"]
+    },
+    "commerce": {
+      "command": "node",
+      "args": ["mcp/commerce-server.mjs"]
     }
   }
 }

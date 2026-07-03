@@ -19,6 +19,7 @@ import { JsonLd } from '@/components/jsonld';
 import { getProductReviews } from '@/server/actions/reviews';
 import { getProductInquiries } from '@/server/actions/inquiries';
 import { AiChat } from '@/components/product/ai-chat';
+import { GroundedConsult } from '@/components/product/grounded-consult';
 import { ProductReviews } from '@/components/product-reviews';
 import { ProductInquiries } from '@/components/product-inquiries';
 
@@ -291,6 +292,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </TabsTrigger>
               <TabsTrigger value="shipping">배송/교환/반품</TabsTrigger>
               <TabsTrigger value="ai-chat">AI 상담</TabsTrigger>
+              <TabsTrigger value="grounded">근거 상담</TabsTrigger>
             </TabsList>
 
             <TabsContent value="description" className="mt-8">
@@ -362,6 +364,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <TabsContent value="ai-chat" className="mt-8">
               <AiChat productSlug={product.slug} />
+            </TabsContent>
+
+            <TabsContent value="grounded" className="mt-8">
+              <GroundedConsult productSlug={product.slug} />
             </TabsContent>
           </Tabs>
         </div>
