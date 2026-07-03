@@ -5,11 +5,12 @@ import { useState } from 'react';
 // L03 상담 챗봇 UI — 상품 상세 페이지 [AI 상담] 탭
 // 같은 질문을 Claude / OpenAI / A.X 로 바꿔 물어볼 수 있게 모델 선택 제공(모델 비교 실습)
 
-type ModelName = 'claude' | 'openai' | 'ax';
+type ModelName = 'claude' | 'openai' | 'ax' | 'gemini';
 const MODELS: { key: ModelName; label: string }[] = [
   { key: 'claude', label: 'Claude' },
   { key: 'openai', label: 'OpenAI' },
   { key: 'ax', label: 'A.X (SK)' },
+  { key: 'gemini', label: 'Gemini' },
 ];
 
 type Msg = { role: 'user' | 'bot'; text: string; source?: string; needHuman?: boolean; model?: string };

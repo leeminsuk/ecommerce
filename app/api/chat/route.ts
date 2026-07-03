@@ -3,10 +3,13 @@ import prisma from '@/lib/prisma';
 import { STORE_POLICY } from '@/lib/policy';
 
 // ── L03 상담 챗봇 API (RAG + 모델 비교) ────────────────────────────
-// POST { message, productSlug, model?: 'claude' | 'openai' | 'ax' }
+// POST { message, productSlug, model?: 'claude' | 'openai' | 'ax' | 'gemini' }
 // 흐름: ① 근거 검색(Retrieval) → ② 근거+질문으로 답 생성(Generation, JSON)
 
-type ModelName = 'claude' | 'openai' | 'ax';
+type ModelName = 'claude' | 'openai' | 'ax' | 'gemini';
+
+// Gemini 모델명 — 배포 상황에 맞게 GEMINI_MODEL 로 교체 가능 (기본: 빠르고 저렴한 flash)
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 export async function POST(req: Request) {
   const { message, productSlug, model = 'claude' } = await req.json();
@@ -88,6 +91,28 @@ async function callModel(model: ModelName, system: string, user: string): Promis
     const d = await r.json();
     if (!r.ok) throw new Error(d?.error?.message ?? 'anthropic error');
     return d.content?.[0]?.text ?? '';
+  }
+
+  if (model === 'gemini') {
+    // Gemini는 OpenAI 호환이 아님 — 전용 엔드포인트·헤더·요청/응답 스키마
+    // 키는 Bearer가 아니라 x-goog-api-key 헤더로 넣는다.
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY!, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: 'user', parts: [{ text: user }] }],
+          // 2.5-flash는 thinking 모델 — thinking을 끄지 않으면 내부 추론이
+          // maxOutputTokens를 먹어 짧은 답이 빈 문자열로 잘린다(finishReason=MAX_TOKENS).
+          generationConfig: { maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+      },
+    );
+    const d = await r.json();
+    if (!r.ok) throw new Error(d?.error?.message ?? 'gemini error');
+    return d.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') ?? '';
   }
 
   // OpenAI 호환 (openai / ax 는 base_url·key·model만 다름)

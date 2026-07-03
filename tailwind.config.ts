@@ -1,4 +1,6 @@
 import type { Config } from 'tailwindcss';
+// Node 24의 ESM 로더는 .ts 설정을 ESM으로 읽어 require()가 없다 → import로 로드
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config: Config = {
   darkMode: ['class'],
@@ -94,7 +96,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;
 
 export default config;

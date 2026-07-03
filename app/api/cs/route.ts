@@ -8,7 +8,10 @@ import prisma from '@/lib/prisma';
 // POST { inquiryId?, message?, productSlug?, model? }
 //   - inquiryId 주면 그 문의를, 아니면 message로 즉석 처리
 
-type ModelName = 'claude' | 'openai' | 'ax';
+type ModelName = 'claude' | 'openai' | 'ax' | 'gemini';
+
+// Gemini 모델명 — GEMINI_MODEL 로 교체 가능 (기본: 빠르고 저렴한 flash)
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -124,6 +127,26 @@ async function callModel(model: ModelName, system: string, user: string, maxToke
     const d = await r.json();
     if (!r.ok) throw new Error(d?.error?.message ?? 'anthropic error');
     return d.content?.[0]?.text ?? '';
+  }
+  if (model === 'gemini') {
+    // Gemini 전용 엔드포인트 — x-goog-api-key 헤더, generateContent 스키마
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY!, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: 'user', parts: [{ text: user }] }],
+          // 2.5-flash는 thinking 모델 — thinking을 끄지 않으면 내부 추론이 토큰을 먹어
+          // 분류(20토큰) 같은 짧은 답이 빈 문자열이 된다(finishReason=MAX_TOKENS).
+          generationConfig: { maxOutputTokens: maxTokens, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+      },
+    );
+    const d = await r.json();
+    if (!r.ok) throw new Error(d?.error?.message ?? 'gemini error');
+    return d.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') ?? '';
   }
   const cfg = {
     openai: { url: 'https://api.openai.com/v1/chat/completions', key: process.env.OPENAI_API_KEY!, model: 'gpt-4o-mini' },

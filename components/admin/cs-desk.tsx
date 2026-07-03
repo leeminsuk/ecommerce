@@ -15,6 +15,7 @@ const MODELS = [
   { key: 'ax', label: 'A.X (SK)' },
   { key: 'claude', label: 'Claude' },
   { key: 'openai', label: 'OpenAI' },
+  { key: 'gemini', label: 'Gemini' },
 ];
 
 export function CsDesk() {
