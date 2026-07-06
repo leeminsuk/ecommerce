@@ -334,8 +334,8 @@ describe('Authentication Integration', () => {
 
       const csp = response.headers.get('Content-Security-Policy');
       expect(csp).toContain("default-src 'self'");
-      expect(csp).toContain('https://js.stripe.com');
-      expect(csp).toContain('https://api.stripe.com');
+      expect(csp).toContain('https://js.tosspayments.com');
+      expect(csp).toContain('https://api.tosspayments.com');
     });
 
     it('should add rate limiting headers for sensitive routes', async () => {
