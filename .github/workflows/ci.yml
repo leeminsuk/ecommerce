@@ -121,12 +121,18 @@ jobs:
       - name: Build application
         run: npm run build
 
+      # cypress-action 내장 wait-on이 HTTP 서버에 TLS로 프로브(EPROTO wrong version number)하는
+      # 버그가 있어 서버 기동·대기는 직접 하고, 액션은 스펙 실행만 맡긴다.
+      - name: Start app and wait
+        run: |
+          npm start &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:3000 >/dev/null && break; sleep 2; done
+          curl -sf http://127.0.0.1:3000 >/dev/null
+
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
-          start: npm start
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
+          install: false
           browser: chrome
           record: false
 
