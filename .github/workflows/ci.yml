@@ -93,7 +93,8 @@ jobs:
       FROM_EMAIL: test@example.com
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NEXT_PUBLIC_APP_NAME: TestStore
-      NODE_ENV: production
+      # NODE_ENV=production을 job env로 두면 npm ci가 devDeps(typescript)를 생략해
+      # Next가 tsconfig paths(@/)를 못 읽고 Module not found가 난다. build/start가 알아서 production으로 동작함.
 
     steps:
       - name: Checkout code
