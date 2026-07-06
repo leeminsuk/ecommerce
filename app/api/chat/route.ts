@@ -125,7 +125,8 @@ async function callModel(model: ModelName, system: string, user: string): Promis
 function parseJsonLoose(text: string): any {
   let s = (text || '').trim();
   const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (fence) s = fence[1].trim();
+  const fenced = fence?.[1];
+  if (fenced) s = fenced.trim();
   const braces = s.match(/\{[\s\S]*\}/);
   if (braces) s = braces[0];
   try {
