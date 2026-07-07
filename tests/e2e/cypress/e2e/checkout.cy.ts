@@ -1,6 +1,10 @@
+// ⚠️ SKIP 사유(2026-07-07): 이 스펙은 앱에 존재한 적 없는 data-testid 계약
+// (product-card, guest-checkout, add-to-cart-button 등)을 기대하는 초기 스캐폴드다.
+// 실제 카트/토스페이먼츠 결제 플로우 기반으로 재작성 전까지 스킵한다.
+// 재작성 백로그: GitHub issue 참조. homepage/navigation 스펙은 실 계약 기반으로 유지.
 // tests/e2e/cypress/e2e/checkout.cy.ts
 
-describe('E-commerce Checkout Flow', () => {
+describe.skip('E-commerce Checkout Flow', () => {
   beforeEach(() => {
     // Mock Stripe
     cy.window().then((win: any) => {

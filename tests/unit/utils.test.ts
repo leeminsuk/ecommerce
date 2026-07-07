@@ -20,20 +20,22 @@ import {
 
 describe('Utility Functions', () => {
   describe('formatCurrency', () => {
-    it('should format USD currency correctly', () => {
-      expect(formatCurrency(29.99)).toBe('$29.99');
-      expect(formatCurrency(1000)).toBe('$1,000.00');
-      expect(formatCurrency(0)).toBe('$0.00');
+    it('기본 통화는 KRW — 소수점 없이 원화 표기 (한국 시장 피벗)', () => {
+      expect(formatCurrency(29.99)).toBe('₩30');
+      expect(formatCurrency(1000)).toBe('₩1,000');
+      expect(formatCurrency(0)).toBe('₩0');
+      expect(formatCurrency(1550000)).toBe('₩1,550,000');
     });
 
-    it('should format other currencies correctly', () => {
-      expect(formatCurrency(29.99, 'EUR')).toBe('€29.99');
-      expect(formatCurrency(29.99, 'GBP')).toBe('£29.99');
+    it('다른 통화도 ko-KR 로케일·정수 자리로 표기한다', () => {
+      expect(formatCurrency(29.99, 'EUR')).toBe('€30');
+      expect(formatCurrency(29.99, 'GBP')).toBe('£30');
+      expect(formatCurrency(29.99, 'USD')).toBe('US$30');
     });
 
-    it('should handle decimal places correctly', () => {
-      expect(formatCurrency(29.999)).toBe('$30.00');
-      expect(formatCurrency(29.1)).toBe('$29.10');
+    it('반올림 — maximumFractionDigits 0', () => {
+      expect(formatCurrency(29.999)).toBe('₩30');
+      expect(formatCurrency(29.1)).toBe('₩29');
     });
   });
 
