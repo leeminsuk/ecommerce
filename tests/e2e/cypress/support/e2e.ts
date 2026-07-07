@@ -123,19 +123,30 @@ after(() => {
   }
 });
 
+// 빠른 연속 내비게이션 때 앱의 세션/데이터 fetch가 중단되며 던지는 무해한 거부만 무시한다
+// (그 외 앱 오류는 그대로 테스트 실패로 승격되어야 함)
+Cypress.on('uncaught:exception', err => {
+  if (err.message.includes('An unexpected response was received from the server')) {
+    return false;
+  }
+});
+
 // Custom Cypress configuration
 Cypress.on('window:before:load', win => {
-  // @ts-ignore - Override geolocation for testing
-  win.navigator.geolocation = {
-    getCurrentPosition: cy.stub().callsFake(success => {
-      return success({
-        coords: {
-          latitude: 40.7128,
-          longitude: -74.006,
-        },
-      });
-    }),
-  };
+  // geolocation은 최신 Chromium에서 getter-only라 직접 대입이 TypeError를 던진다
+  // → defineProperty로 교체 (cy.stub은 테스트 컨텍스트 밖이라 일반 함수 사용)
+  Object.defineProperty(win.navigator, 'geolocation', {
+    configurable: true,
+    value: {
+      getCurrentPosition: (success: (pos: unknown) => void) =>
+        success({
+          coords: {
+            latitude: 40.7128,
+            longitude: -74.006,
+          },
+        }),
+    },
+  });
 
   // @ts-ignore - Mock IntersectionObserver if not available
   if (!win.IntersectionObserver) {

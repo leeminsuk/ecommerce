@@ -143,13 +143,20 @@ export async function middleware(request: NextRequest) {
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   response.headers.set('X-XSS-Protection', '1; mode=block');
 
-  // HTTPS redirect in production
+  // HTTPS redirect in production — 프록시가 x-forwarded-proto로 http임을 명시할 때만.
+  // 로컬 next start·CI E2E 같은 직결 요청은 이 헤더가 없으므로 리다이렉트하지 않는다
+  // (기존: 헤더 부재 시에도 301 → localhost가 https로 튕겨 E2E·헬스체크 전멸).
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const hostHeader = request.headers.get('host') ?? '';
+  const isLocalHost = hostHeader.startsWith('localhost') || hostHeader.startsWith('127.');
   if (
     process.env.NODE_ENV === 'production' &&
-    request.headers.get('x-forwarded-proto') !== 'https'
+    forwardedProto !== null &&
+    forwardedProto !== 'https' &&
+    !isLocalHost
   ) {
     return NextResponse.redirect(
-      `https://${request.headers.get('host')}${request.nextUrl.pathname}`,
+      `https://${hostHeader}${request.nextUrl.pathname}`,
       301
     );
   }

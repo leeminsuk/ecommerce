@@ -8,7 +8,7 @@ describe('Homepage E2E Tests', () => {
 
   it('should load the homepage successfully', () => {
     // Verify page title or heading exists
-    cy.contains('h1, h2', /product|store|welcome|shop/i).should('be.visible');
+    cy.contains('h1, h2', /product|store|welcome|shop|상품|스토어|쇼핑/i).should('be.visible');
   });
 
   it('should display products on homepage', () => {
