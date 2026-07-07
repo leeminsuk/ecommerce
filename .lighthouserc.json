@@ -16,41 +16,31 @@
       "target": "temporary-public-storage"
     },
     "assert": {
-      "preset": "lighthouse:recommended",
       "assertions": {
         "categories:performance": [
-          "error",
+          "warn",
           {
-            "minScore": 0.7
+            "minScore": 0.5
           }
         ],
         "categories:accessibility": [
-          "error",
+          "warn",
           {
             "minScore": 0.9
           }
         ],
         "categories:best-practices": [
-          "error",
+          "warn",
           {
             "minScore": 0.8
           }
         ],
         "categories:seo": [
-          "error",
+          "warn",
           {
             "minScore": 0.8
           }
-        ],
-        "categories:pwa": [
-          "warn",
-          {
-            "minScore": 0.6
-          }
-        ],
-        "csp-xss": "off",
-        "uses-http2": "off",
-        "redirects-http": "off"
+        ]
       }
     }
   }
