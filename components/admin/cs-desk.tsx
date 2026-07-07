@@ -19,8 +19,8 @@ const MODELS = [
 
 export function CsDesk() {
   const [model, setModel] = useState('ax');
-  const [message, setMessage] = useState(PRESETS[0].message);
-  const [slug, setSlug] = useState<string | undefined>(PRESETS[0].productSlug);
+  const [message, setMessage] = useState(PRESETS[0]?.message ?? '');
+  const [slug, setSlug] = useState<string | undefined>(PRESETS[0]?.productSlug);
   const [loading, setLoading] = useState(false);
   const [res, setRes] = useState<any>(null);
 
